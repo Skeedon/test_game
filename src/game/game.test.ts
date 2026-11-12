@@ -114,6 +114,36 @@ describe('economy and persistence', () => {
    expect(recovered.deals).toEqual([]);
   }
  });
+ it.each([
+  ['numeric', 100],
+  ['nonnumeric', 'invalid']
+ ])('rejects saved condition with extra %s field', (_label, extra) => {
+  const initial = newGame();
+  const corruptCar = {
+   ...initial.market[0],
+   condition: {engine: 50, body: 50, suspension: 50, extra}
+  };
+  for (const invalid of [
+   {...initial, market: [corruptCar]},
+   {...initial, car: corruptCar, market: initial.market.slice(1), invested: corruptCar.price}
+  ]) {
+   expect(isGame(invalid)).toBe(false);
+   expect(saveGame(invalid as never, storage())).toBe(false);
+   const restored = loadGame(storage(JSON.stringify(invalid)));
+   expect(restored.balance).toBe(5000);
+   expect(restored.car).toBeNull();
+   expect(restored.deals).toEqual([]);
+  }
+ });
+ it('ignores unexpected fields when computing resale price', () => {
+  const car = {
+   ...newGame().market[0],
+   value: 5000,
+   condition: {engine: 50, body: 50, suspension: 50, extra: 'corrupt'}
+  };
+  expect(salePrice(car as never)).toBe(3375);
+  expect(Number.isFinite(salePrice(car as never))).toBe(true);
+ });
  it('rejects unknown repair parts at runtime', () => {
   const initial = newGame();
   const bought = transact(initial, {type: 'buy', id: initial.market[0].id});
