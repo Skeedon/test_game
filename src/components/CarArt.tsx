@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import type { Car } from '../game/game';
 import { getCarAsset } from './carAssets';
 function FallbackCarArt({ color = '#a6bba1', shape = 'sedan', ghost = false }: { color?: string; shape?: string; ghost?: boolean }) {
@@ -10,8 +10,9 @@ function FallbackCarArt({ color = '#a6bba1', shape = 'sedan', ghost = false }: {
 
 /** One renderer for market cards, the garage and future car views. */
 export default function CarArt({ car, ghost = false }: { car?: Car | null; ghost?: boolean }) {
+ const [failedSrc, setFailedSrc] = useState<string>();
  const asset = car ? getCarAsset(car) : undefined;
- if (!car || !asset || ghost) return <FallbackCarArt color={car?.color} shape={car?.shape} ghost={ghost}/>;
+ if (!car || !asset || ghost || failedSrc === asset.src) return <FallbackCarArt color={car?.color} shape={car?.shape} ghost={ghost}/>;
  return <img
   className="car-art car-art--asset"
   src={asset.src}
@@ -20,5 +21,6 @@ export default function CarArt({ car, ghost = false }: { car?: Car | null; ghost
   height={320}
   decoding="async"
   draggable={false}
+  onError={() => setFailedSrc(asset.src)}
  />;
 }

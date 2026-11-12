@@ -6,6 +6,6 @@
 /* Shared side-profile artwork: reserve its aspect ratio and keep every wheel
    inside the frame, including narrow market cards. */
 .car-art--asset{aspect-ratio:5/2;object-fit:contain;user-select:none}
-.market-visual .car-art--asset{width:100%;max-width:420px;left:50%;bottom:9px;transform:translateX(-50%);filter:drop-shadow(0 9px 5px #0005)}
+.market-visual .car-art--asset{width:calc(100% - 16px);height:calc(100% - 43px);max-width:420px;left:50%;bottom:9px;object-position:center bottom;transform:translateX(-50%);filter:drop-shadow(0 9px 5px #0005)}
 .car-stage .car-art--asset{filter:drop-shadow(0 13px 7px #0006)}
 @media(max-width:680px){.market-visual .car-art--asset{bottom:10px}}
