@@ -3,7 +3,7 @@ export type Car = { id: string; brand: string; model: string; year: number; km: 
 export type Deal = { id: string; name: string; kind: 'buy' | 'sell' | 'repair'; amount: number; date: string };
 export type Game = { balance: number; car: Car | null; market: Car[]; deals: Deal[]; sold: number; profit: number; invested: number };
 export const money = (n: number) => '$' + Math.round(n).toLocaleString('en-US');
-export const average = (car: Car) => Math.round(Object.values(car.condition).reduce((a, b) => a + b, 0) / 3);
+export const average = (car: Car) => Math.round((car.condition.engine + car.condition.body + car.condition.suspension) / 3);
 export const salePrice = (car: Car) => Math.round(car.value * (.35 + average(car) / 100 * .65));
 export const repairPrice = (car: Car, part: Part) => Math.ceil((100 - car.condition[part]) * car.value * (part === 'engine' ? .003 : .002));
 const uniqueId = () => globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -37,6 +37,7 @@ function validCar(value: unknown): value is Car {
   typeof value.color === 'string' && /^#[0-9a-f]{6}$/i.test(value.color) &&
   typeof value.shape === 'string' && ['sedan', 'hatch', 'coupe'].includes(value.shape) &&
   integer(value.price, 1) && integer(value.value, 1) &&
+  Object.keys(condition).length === PARTS.length &&
   PARTS.every(part => integer(condition[part]) && (condition[part] as number) <= 100);
 }
 export function isGame(value: unknown): value is Game {
